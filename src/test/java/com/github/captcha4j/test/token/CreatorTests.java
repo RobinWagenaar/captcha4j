@@ -18,8 +18,8 @@ package com.github.captcha4j.test.token;
 
 import com.github.captcha4j.core.audio.AudioCaptcha;
 import com.github.captcha4j.core.audio.AudioCaptchaBuilder;
-import com.github.captcha4j.core.text.ImageCaptcha;
-import com.github.captcha4j.core.text.ImageCaptchaBuilder;
+import com.github.captcha4j.core.image.ImageCaptcha;
+import com.github.captcha4j.core.image.ImageCaptchaBuilder;
 import org.junit.jupiter.api.Test;
 
 public class CreatorTests {
@@ -27,7 +27,7 @@ public class CreatorTests {
     @Test
     public void testCaptchaTokenCreation() {
         ImageCaptcha captcha = new ImageCaptchaBuilder(200, 100)
-                .addText()
+                .addRandomAnswer()
                 .addNoise()
                 .addBorder()
                 .build();
@@ -36,7 +36,7 @@ public class CreatorTests {
     @Test
     public void testAudioCaptchaTokenCreation() {
         AudioCaptcha captcha = new AudioCaptchaBuilder()
-                .addAnswer()
+                .addRandomAnswer()
                 .addNoise()
                 .addVoice()
                 .build();

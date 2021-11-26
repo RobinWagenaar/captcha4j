@@ -1,10 +1,11 @@
 package com.github.captcha4j.integrationtest;
 
-import com.github.captcha4j.core.text.ImageCaptchaBuilder;
-import com.github.captcha4j.core.text.producer.backgrounds.GradientBackgroundProducer;
-import com.github.captcha4j.core.text.producer.noise.CurvedLineNoiseProducer;
-import com.github.captcha4j.core.text.ImageCaptcha;
-import com.github.captcha4j.core.text.gimpy.FishEyeGimpyRenderer;
+import com.github.captcha4j.core.image.ImageCaptchaBuilder;
+import com.github.captcha4j.core.image.producer.backgrounds.GradientBackgroundProducer;
+import com.github.captcha4j.core.image.producer.noise.CurvedLineNoiseProducer;
+import com.github.captcha4j.core.image.ImageCaptcha;
+import com.github.captcha4j.core.image.gimpy.FishEyeGimpyRenderer;
+import org.junit.jupiter.api.Test;
 
 import javax.swing.*;
 
@@ -13,7 +14,7 @@ public class ImageCaptchaTest {
     //@Test
     public void test() throws InterruptedException {
         ImageCaptcha captcha = new ImageCaptchaBuilder(200, 100)
-                .addText()
+                .addRandomAnswer()
                 .addNoise(new CurvedLineNoiseProducer())
                 .addBackground(new GradientBackgroundProducer())
                 .gimp(new FishEyeGimpyRenderer())

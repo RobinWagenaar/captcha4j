@@ -4,8 +4,8 @@ import com.github.captcha4j.core.audio.producer.RandomNumberVoiceProducer;
 import com.github.captcha4j.core.audio.producer.VoiceProducer;
 import com.github.captcha4j.core.audio.producer.noise.NoiseProducer;
 import com.github.captcha4j.core.audio.producer.noise.RandomNoiseProducer;
-import com.github.captcha4j.core.text.producer.NumbersAnswerProducer;
-import com.github.captcha4j.core.text.producer.TextProducer;
+import com.github.captcha4j.core.image.producer.NumbersAnswerProducer;
+import com.github.captcha4j.core.image.producer.TextProducer;
 
 import java.security.SecureRandom;
 import java.util.ArrayList;
@@ -39,7 +39,7 @@ public class AudioCaptchaBuilder {
      *
      * @return the builder with answer added
      */
-    public AudioCaptchaBuilder addAnswer() {
+    public AudioCaptchaBuilder addRandomAnswer() {
         return addAnswer(new NumbersAnswerProducer());
     }
 
@@ -97,6 +97,8 @@ public class AudioCaptchaBuilder {
         noiseProds.add(noiseProd);
         return this;
     }
+
+
 
     /**
      * Builds the captcha

@@ -10,7 +10,7 @@ Supports internationalisation for audio.
 ### Build captcha
 
 ```java
-Captcha captcha = new Captcha.Builder(200, 50)
+ImageCaptcha captcha = new ImageCaptchaBuilder(200, 50)
         .addText()
         .addNoise()
         .addBackground()

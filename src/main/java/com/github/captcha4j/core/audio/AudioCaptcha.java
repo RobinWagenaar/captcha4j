@@ -1,23 +1,12 @@
 package com.github.captcha4j.core.audio;
 
 import com.github.captcha4j.core.Captcha;
-import com.github.captcha4j.core.audio.producer.RandomNumberVoiceProducer;
-import com.github.captcha4j.core.audio.producer.VoiceProducer;
-import com.github.captcha4j.core.audio.producer.noise.NoiseProducer;
-import com.github.captcha4j.core.audio.producer.noise.RandomNoiseProducer;
-import com.github.captcha4j.core.text.producer.NumbersAnswerProducer;
-import com.github.captcha4j.core.text.producer.TextProducer;
 
 import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
-import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.security.SecureRandom;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
 
 /**
  * A builder for generating a CAPTCHA audio/answer pair.
