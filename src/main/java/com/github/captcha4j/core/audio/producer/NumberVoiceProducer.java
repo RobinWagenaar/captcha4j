@@ -18,23 +18,27 @@ import java.util.Random;
  * <code>sounds/en/numbers/1-alex.wav</code>.
  * </p>
  *
+ * @author <a href="mailto:wagenaar.robin@gmail.com">Robin Wagenaar</a>
  * @author <a href="mailto:james.childers@gmail.com">James Childers</a>
  * @author <a href="mailto:subhajitdas298@gmail.com">Subhajit Das</a>
  */
 public class RandomNumberVoiceProducer implements VoiceProducer {
 
-    /**
-     * The secure random
-     */
+    private final Map<Integer, String[]> voices;
+
     private static final Random RAND = new SecureRandom();
-    /**
-     * The default voices
-     */
-    private static final String[] DEFAULT_VOICES = {"alex", "bruce", "fred",
-            "ralph", "kathy", "vicki", "victoria"};
-    /**
-     * The default voice map
-     */
+
+
+    private static final String[] DEFAULT_VOICES = {
+            "alex",
+            "bruce",
+            "fred",
+            "ralph",
+            "kathy",
+            "vicki",
+            "victoria"
+    };
+
     private static final Map<Integer, String[]> DEFAULT_VOICES_MAP;
 
     static {
@@ -56,10 +60,7 @@ public class RandomNumberVoiceProducer implements VoiceProducer {
         }
     }
 
-    /**
-     * The voices to use
-     */
-    private final Map<Integer, String[]> _voices;
+
 
     /**
      * The default constructor
@@ -81,7 +82,7 @@ public class RandomNumberVoiceProducer implements VoiceProducer {
      * @param voices the voices
      */
     public RandomNumberVoiceProducer(Map<Integer, String[]> voices) {
-        _voices = voices;
+        this.voices = voices;
     }
 
     /**
@@ -90,13 +91,13 @@ public class RandomNumberVoiceProducer implements VoiceProducer {
      * @return the voices
      */
     public Map<Integer, String[]> getVoices() {
-        return Collections.unmodifiableMap(_voices);
+        return Collections.unmodifiableMap(voices);
     }
 
     /**
      * Gets the vocalization
      *
-     * @param num the number o vocalize
+     * @param num the number to vocalize
      * @return the vocal/audio sample of the number
      */
     @Override
@@ -110,9 +111,8 @@ public class RandomNumberVoiceProducer implements VoiceProducer {
         }
 
         int idx = Integer.parseInt(num + "");
-        String[] files = _voices.get(idx);
+        String[] files = voices.get(idx);
         String filename = files[RAND.nextInt(files.length)];
-
         return FileUtil.readSample(filename);
     }
 
