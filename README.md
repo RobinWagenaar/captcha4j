@@ -9,7 +9,6 @@ Tiny java library for generating images and audio-fragments for use in Captcha's
 ## Usage
 
 ### Build captcha
-
 ```java
 ImageCaptcha imageCaptcha = new ImageCaptchaBuilder(200, 50)
         .addAnswer("123abc")
@@ -25,6 +24,13 @@ AudioCaptcha audioCaptcha = new AudioCaptchaBuilder()
         .build();
 AudioInputStream stream = audioCaptcha.getAudio().getAudioInputStream();
 ```
+
+### Example output:
+![captcha-example-1](https://github.com/RobinWagenaar/captcha4j/raw/main/captcha4j-examples/captcha-1.png)
+![captcha-example-2](https://github.com/RobinWagenaar/captcha4j/raw/main/captcha4j-examples/captcha-2.png)
+![captcha-example-4](https://github.com/RobinWagenaar/captcha4j/raw/main/captcha4j-examples/captcha-4.png)
+![captcha-example-3](https://github.com/RobinWagenaar/captcha4j/raw/main/captcha4j-examples/captcha-3.png)
+
 
 ## Credits
 This project is forked from Stateless-captcha 1.2.1 (https://github.com/sdtool/stateless-captcha), which was in turn based on SimpleCaptcha 
