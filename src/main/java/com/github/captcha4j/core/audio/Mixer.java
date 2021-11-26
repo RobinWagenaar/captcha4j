@@ -6,7 +6,7 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.github.captcha4j.core.audio.Sample.SC_AUDIO_FORMAT;
+
 
 /**
  * Helper class for operating on audio {@link Sample}s.
@@ -117,7 +117,7 @@ public class Mixer {
                                                 double[] sample) {
         byte[] buffer = Sample.asByteArray(sampleCount, sample);
         InputStream bais = new ByteArrayInputStream(buffer);
-        return new AudioInputStream(bais, SC_AUDIO_FORMAT, sampleCount);
+        return new AudioInputStream(bais, Sample.SC_AUDIO_FORMAT, sampleCount);
     }
 
     /**

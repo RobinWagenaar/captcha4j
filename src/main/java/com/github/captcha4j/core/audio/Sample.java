@@ -33,8 +33,8 @@ public class Sample {
             16000, // sample rate
             16, // sample size in bits
             1, // channels
-            true, // signed?
-            false); // big endian?;
+            true, // signed
+            false); // little endian
 
     private final AudioInputStream _audioInputStream;
 
@@ -90,7 +90,7 @@ public class Sample {
      * @param af the audio format to check
      */
     private static void checkFormat(AudioFormat af) {
-        if (!af.matches(SC_AUDIO_FORMAT)) {
+        if (!af.matches(SC_AUDIO_FORMAT) ){
             throw new IllegalArgumentException(
                     "Unsupported audio format.\nReceived: " + af.toString()
                             + "\nExpected: " + SC_AUDIO_FORMAT);

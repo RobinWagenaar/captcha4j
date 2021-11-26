@@ -37,8 +37,7 @@ public class FileUtil {
     public static InputStream readResource(String filename) {
         InputStream inputStream = FileUtil.class.getResourceAsStream(filename);
         if (inputStream == null) {
-            throw new RuntimeException(new FileNotFoundException("File '"
-                    + filename + "' not found."));
+            throw new RuntimeException(new FileNotFoundException("File '" + filename + "' not found."));
         }
 
         ByteArrayOutputStream buffer = new ByteArrayOutputStream();
