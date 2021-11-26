@@ -20,13 +20,17 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.github.sdtool</groupId>
-    <artifactId>stateless-captcha</artifactId>
-    <version>1.2.0</version>
+    <groupId>com.github.captcha4j</groupId>
+    <artifactId>captcha4j-core</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>${project.groupId}:${project.artifactId}</name>
-    <description>Stateless captcha library for java</description>
+    <description>
+		Easy to use Captcha generator for Java, which supports both 
+		image and audio captcha's and internationalisation.
+	</description>
+	
     <url>https://github.com/sdtool/stateless-captcha</url>
 
     <licenses>
@@ -38,10 +42,26 @@
     </licenses>
 
     <developers>
+		<developer>
+            <name>Robin Wagenaar</name>
+            <email>wagenaar.robin@gmail.com</email>
+        </developer>
         <developer>
+			<!-- 
+			Developer of stateless-captcha, which is derived from SimpleCaptcha (1.2.1).
+			The sources of stateless captcha are last seen here: 
+			https://github.com/sdtool/stateless-captcha 
+			-->
             <name>Subhajit Das</name>
             <email>subhajitdas298@gmail.com</email>
         </developer>
+		<developer>
+			<!-- 
+			Developer of SimpleCaptcha, which is last seen here:
+			http://simplecaptcha.sourceforge.net/ 
+			-->
+			<name>James Childers</name>
+		</developer>
     </developers>
 
     <scm>

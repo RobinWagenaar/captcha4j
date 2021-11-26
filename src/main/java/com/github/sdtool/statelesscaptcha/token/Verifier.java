@@ -71,15 +71,16 @@ public class Verifier {
     /**
      * Verify captcha
      *
-     * @param verification the verification token model
+     * @param jwtToken
+     * @param answer
      */
-    public void verify(CaptchaVerificationToken verification) {
+    public void verify(String jwtToken, String answer) {
         try {
-            Algorithm algorithm = Algorithm.HMAC256(verification.getCaptcha());
+            Algorithm algorithm = Algorithm.HMAC256(answer);
             JWTVerifier verifier = JWT.require(algorithm)
                     .withIssuer(properties.getIssuer())
                     .build();
-            verifier.verify(verification.getToken());
+            verifier.verify(jwtToken);
         } catch (JWTVerificationException exception) {
             throw new VerificationException(exception.getMessage());
         }

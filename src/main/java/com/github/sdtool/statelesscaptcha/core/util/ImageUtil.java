@@ -9,7 +9,7 @@ import java.awt.image.BufferedImageOp;
  *
  * @author <a href="mailto:subhajitdas298@gmail.com">Subhajit Das</a>
  */
-public class ImageUtil {
+public class  ImageUtil {
 
     /**
      * Applies the image op filter to image

@@ -17,11 +17,9 @@
 package com.github.sdtool.statelesscaptcha.test.token;
 
 import com.github.sdtool.statelesscaptcha.core.audio.AudioCaptcha;
+import com.github.sdtool.statelesscaptcha.core.text.Captcha;
 import com.github.sdtool.statelesscaptcha.exception.VerificationException;
-import com.github.sdtool.statelesscaptcha.token.CaptchaToken;
-import com.github.sdtool.statelesscaptcha.token.CaptchaVerificationToken;
-import com.github.sdtool.statelesscaptcha.token.Creator;
-import com.github.sdtool.statelesscaptcha.token.Verifier;
+import com.github.sdtool.statelesscaptcha.token.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -35,8 +33,9 @@ public class VerifierTests {
                 .addNoise()
                 .addVoice()
                 .build();
-        CaptchaToken token = new Creator().create(captcha);
-        new Verifier().verify(new CaptchaVerificationToken(token.getToken(), ANSWER));
+
+        String jwt = new Creator().createSignedJWT(ANSWER);
+        new Verifier().verify(jwt, ANSWER);
     }
 
     @Test
@@ -47,9 +46,33 @@ public class VerifierTests {
                 .addNoise()
                 .addVoice()
                 .build();
-        CaptchaToken token = new Creator().create(captcha);
+        String token = new Creator().createSignedJWT(ANSWER);
         Assertions.assertThrows(VerificationException.class,
-                () -> new Verifier().verify(new CaptchaVerificationToken(token.getToken(), ANSWER + "2")));
+                () -> new Verifier().verify(token, ANSWER + "2"));
+    }
+
+    @Test
+    public void testTokenExpired() throws InterruptedException {
+        TokenProperties props = new TokenProperties();
+        props.setValidity(0);
+
+        Captcha captcha = new Captcha.Builder(200, 50)
+                .addText()
+                .addNoise()
+                .addBackground()
+                .build();
+
+        Creator creator = new Creator(props);
+        String jwt = creator.createSignedJWT(captcha.getAnswer());
+
+        // wait for current second to pass
+        Thread.sleep(1000);
+
+        // expect exception upon verification
+        Verifier verifier = new Verifier(props);
+        Assertions.assertThrows(VerificationException.class,
+                () -> verifier.verify(jwt, captcha.getAnswer())
+        );
     }
 
 }

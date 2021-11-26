@@ -26,6 +26,7 @@ import com.github.sdtool.statelesscaptcha.util.Base64Util;
 
 import javax.sound.sampled.AudioFileFormat;
 import java.io.IOException;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
@@ -76,59 +77,19 @@ public class Creator {
         this.properties = properties;
     }
 
-    /**
-     * Generate token representation of text captcha
-     *
-     * @param captcha the captcha to convert
-     * @return the token model
-     */
-    public CaptchaToken create(Captcha captcha) {
-        try {
-            Algorithm algorithm = Algorithm.HMAC256(captcha.getAnswer());
-            Date in = new Date();
-            LocalDateTime ldt = LocalDateTime.ofInstant(in.toInstant(), ZoneId.systemDefault())
-                    .plusSeconds(properties.getValidity());
-            Date out = Date.from(ldt.atZone(ZoneId.systemDefault()).toInstant());
-            String token = JWT.create()
-                    .withExpiresAt(out)
-                    .withIssuer(properties.getIssuer())
-                    .sign(algorithm);
-            return new CaptchaToken(
-                    Base64Util.encodeImage(captcha.getImage(), "png"),
-                    "png",
-                    token);
-        } catch (JWTCreationException | IllegalArgumentException | IOException exception) {
-            //Invalid Signing configuration / Couldn't convert Claims.
-            throw new IllegalArgumentException("Unable to create token");
-        }
-    }
 
     /**
-     * Generate token representation of audio captcha
-     *
-     * @param captcha the captcha to convert
-     * @return the token model
+     * Generate a JsonWebToken and sign it based on a secret
      */
-    public CaptchaToken create(AudioCaptcha captcha) {
-        try {
-            Algorithm algorithm = Algorithm.HMAC256(captcha.getAnswer());
-            Date in = new Date();
-            LocalDateTime ldt = LocalDateTime.ofInstant(in.toInstant(), ZoneId.systemDefault())
-                    .plusSeconds(properties.getValidity());
-            Date out = Date.from(ldt.atZone(ZoneId.systemDefault()).toInstant());
-            String token = JWT.create()
-                    .withExpiresAt(out)
-                    .withIssuer(properties.getIssuer())
-                    .sign(algorithm);
-            return new CaptchaToken(
-                    Base64Util.encodeAudio(captcha.getChallenge().getAudioInputStream(),
-                            AudioFileFormat.Type.WAVE),
-                    "wav",
-                    token);
-        } catch (JWTCreationException | IllegalArgumentException | IOException exception) {
-            //Invalid Signing configuration / Couldn't convert Claims.
-            throw new CreationException("Unable to create token");
-        }
+    public String createSignedJWT(String secret){
+        Algorithm algorithm = Algorithm.HMAC256(secret);
+        LocalDateTime now = LocalDateTime.ofInstant(new Date().toInstant(), ZoneId.systemDefault());
+        LocalDateTime exp = now.plusSeconds(properties.getValidity());
+
+        return JWT.create()
+                .withExpiresAt(Date.from(exp.atZone(ZoneId.systemDefault()).toInstant()))
+                .withIssuer(properties.getIssuer())
+                .sign(algorithm);
     }
 
 }
