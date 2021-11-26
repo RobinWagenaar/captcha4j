@@ -11,7 +11,7 @@ Supports internationalisation for audio.
 
 ```java
 ImageCaptcha captcha = new ImageCaptchaBuilder(200, 50)
-        .addText()
+        .addAnswer("123abc")
         .addNoise()
         .addBackground()
         .build();
