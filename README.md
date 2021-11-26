@@ -2,21 +2,31 @@
 
 Tiny java library for generating images and audio-fragments for use in Captcha's. 
 
-Supports internationalisation for audio. 
-
+- Easy configuration and customization of the difficulty level.
+- Supports internationalization for audio, with 7 English voices and 4 Dutch voices already included.
+- Minimal number of third party libraries required. 
 
 ## Usage
 
 ### Build captcha
 
 ```java
-ImageCaptcha captcha = new ImageCaptchaBuilder(200, 50)
+ImageCaptcha imageCaptcha = new ImageCaptchaBuilder(200, 50)
         .addAnswer("123abc")
         .addNoise()
         .addBackground()
         .build();
+BufferedImage image = imageCaptcha.getImage()
+
+AudioCaptcha audioCaptcha = new AudioCaptchaBuilder()
+        .addRandomAnswer()
+        .addVoice(Language.NL)
+        .addNoise()
+        .build();
+AudioInputStream stream = audioCaptcha.getAudio().getAudioInputStream();
 ```
 
+## Credits
 This project is forked from Stateless-captcha 1.2.1 (https://github.com/sdtool/stateless-captcha), which was in turn based on SimpleCaptcha 
 version 1.2.1 (http://simplecaptcha.sourceforge.net/). There are significant backwards-incompatible changes breaking compatibility with the
-original works (no support for mix-and-match :)). 
+original works (mix-and-match is not recommended :)). 
