@@ -11,12 +11,10 @@ public class AudioCaptchaTester {
 
     public static void main(String... args) throws InterruptedException, LineUnavailableException, IOException {
         AudioCaptcha audioCaptcha = new AudioCaptchaBuilder()
-                .addRandomAnswer()
+                .addAnswer("12345")
                 .addVoice(Language.NL)
                 .addNoise()
                 .build();
-
-
 
         AudioInputStream stream = audioCaptcha.getAudio().getAudioInputStream();
         AudioFormat format = audioCaptcha.getAudio().getFormat();

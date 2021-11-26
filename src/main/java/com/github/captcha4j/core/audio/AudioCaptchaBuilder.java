@@ -41,18 +41,14 @@ public class AudioCaptchaBuilder {
      * @return the builder with answer added
      */
     public AudioCaptchaBuilder addRandomAnswer() {
-        return addAnswer(new NumbersAnswerProducer());
+        String answer = new NumbersAnswerProducer().getText();
+        return addAnswer(answer);
+
     }
 
-    /**
-     * Add the answer with provided answer producer
-     *
-     * @param ansProd the answer producer
-     * @return the builder with answer added
-     */
-    public AudioCaptchaBuilder addAnswer(TextProducer ansProd) {
-        answer += ansProd.getText();
 
+    public AudioCaptchaBuilder addAnswer(String answer) {
+        this.answer = answer;
         return this;
     }
 
@@ -75,7 +71,6 @@ public class AudioCaptchaBuilder {
      */
     public AudioCaptchaBuilder addVoice(VoiceProducer vProd) {
         voiceProds.add(vProd);
-
         return this;
     }
 
