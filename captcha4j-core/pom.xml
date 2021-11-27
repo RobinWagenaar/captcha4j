@@ -48,8 +48,8 @@
         </developer>
         <developer>
 			<!-- 
-			Developer of stateless-captcha, which is derived from SimpleCaptcha (1.2.1).
-			The sources of stateless captcha are last seen here: 
+			Developer of stateless-captcha, which is derived from SimpleCaptcha
+			(1.2.1). The sources of stateless captcha are last seen here:
 			https://github.com/sdtool/stateless-captcha 
 			-->
             <name>Subhajit Das</name>
@@ -135,6 +135,10 @@
                         </goals>
                     </execution>
                 </executions>
+                <configuration>
+                    <failOnWarnings>false</failOnWarnings>
+                    <failOnError>false</failOnError>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
