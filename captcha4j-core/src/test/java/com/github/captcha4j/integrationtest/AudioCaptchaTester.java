@@ -11,7 +11,7 @@ public class AudioCaptchaTester {
 
     public static void main(String... args) throws InterruptedException, LineUnavailableException, IOException {
         AudioCaptcha audioCaptcha = new AudioCaptchaBuilder()
-                .addAnswer("12345")
+                .addAnswer("1a23d45c")
                 .addVoice(Language.NL)
                 .addNoise()
                 .build();

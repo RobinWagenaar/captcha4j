@@ -26,13 +26,8 @@ public class NumberVoiceProducer implements VoiceProducer {
 
     private static Map<Language, List<String>> VOICES_BY_LANGUAGE = new HashMap<Language, List<String>>(){{
         put(Language.EN, Arrays.asList(
-                "alex",
-                "bruce",
-                "fred",
-                "kathy",
-                "ralph",
-                "vicki",
-                "victoria"
+                "acclivity",
+                "desuperanton"
         ));
 
         put(Language.NL, Arrays.asList(
@@ -50,23 +45,21 @@ public class NumberVoiceProducer implements VoiceProducer {
     /**
      * Gets the vocalization
      *
-     * @param num the number to vocalize
+     * @param chr the character to vocalize
      * @oaram lang the language needed
-     * @return the vocal/audio sample of the number
+     * @return the vocal/audio sample of the character
      */
     @Override
-    public final Sample getVocalization(char num) {
-        try {
-            List<String> voices = VOICES_BY_LANGUAGE.get(currentLanguage);
-            String randomVoice = voices.get(RAND.nextInt(voices.size()));
-            int number = Integer.valueOf(num + "");
-            String file = "/sounds/voices/"+currentLanguage.toString().toLowerCase()+"/"+randomVoice+"/"+number+"-"+randomVoice + ".wav";
-            System.out.println(file);
-            return FileUtil.readSample(file);
-
-        } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("Expected <num> to be a number, got '" + num + "' instead.", e);
+    public final Sample getVocalization(char chr) {
+        if (!String.valueOf(chr).matches("^[a-zA-Z0-9]*$")){
+            throw new IllegalArgumentException("Voice samples are only available for a-z and 0-9. Requested was: " + chr);
         }
+
+        List<String> voices = VOICES_BY_LANGUAGE.get(currentLanguage);
+        String randomVoice = voices.get(RAND.nextInt(voices.size()));
+        String file = "/sounds/voices/"+currentLanguage.toString().toLowerCase()+"/"+randomVoice+"/"+Character.toLowerCase(chr)+"-"+randomVoice + ".wav";
+        System.out.println(file);
+        return FileUtil.readSample(file);
     }
 
 }
