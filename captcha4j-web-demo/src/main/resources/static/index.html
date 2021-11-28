@@ -1,121 +1,85 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <script src="jquery-3.6.0.js"></script>
-    <title>Captcha4J Demo</title>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <script>
-        $(document).ready(function() {
-            $("#refresh").on('click',refreshChallenge);
-            $("#audio_language").on('change', loadAudioCaptcha);
-            $("#verify").on('click', verify);
-            refreshChallenge()
-        });
+        <link href="bootstrap-5.1.3.css" rel="stylesheet"/>
+        <link href="captcha.css" rel="stylesheet"/>
+        <title>Captcha4J Demo</title>
+    </head>
+    <body>
+        <div id="modal" class="modal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Please solve the captcha to continue..</h5>
+                    </div>
+                    <div class="modal-body">
+                        <div class="container-fluid">
+                            <div class="row">
+                                <div class="col-12">
+                                    <image id="image_challenge" ></image>
+                                </div>
+                            </div>
 
-        let captchaDetails = {};
+                            <hr/>
 
-        refreshChallenge = function(){
-            $.ajax({
-                url: "/captcha/challenge",
-                method: "GET",
-                success: function (data, status, xhr) {
-                    clearTimeout(captchaDetails.timer)
-                    captchaDetails.challenge = xhr.getResponseHeader("X-Captcha-Challenge");
-                    captchaDetails.timeoutSeconds = xhr.getResponseHeader("X-Captcha-Timeout");
-                    captchaDetails.validUntil = xhr.getResponseHeader("X-Captcha-ValidUntil");
+                            <div class="row">
+                                <div class="col-4">
+                                    <label for="audio_language" class="form-label">Audio language:</label>
+                                </div>
+                                <div class="col-8">
+                                    <select id="audio_language" class="form-select">
+                                        <option value="EN" selected>English</option>
+                                        <option value="NL">Nederlands</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row py-2">
+                                <audio controls id="audio_challenge" type="audio/x-wav"> </audio>
+                            </div>
 
-                    updateTimeout();
-                    loadImageCaptcha();
-                    loadAudioCaptcha();
-                    $("#answer").val("");
-                }
-            });
-        };
+                            <hr/>
+                            <div class="row" >
+                                <div class="col-4">
+                                    <label for="answer" class="col-form-label">Answer:</label>
+                                </div>
+                                <div class="col-8">
+                                    <input type="text" id="answer" class="form-control"/>
+                                </div>
+                            </div>
 
-        loadImageCaptcha = function(){
-            $.ajax({
-                url: "/captcha/image",
-                method: "GET",
-                headers : { "X-Captcha-Challenge" : captchaDetails.challenge },
-                xhrFields: { responseType: "blob" },
-                success: function (data) {
-                    $("#image_challenge").attr("src", window.URL.createObjectURL(data));
-                }
-            });
-        };
+                            <div class="row">
+                                <div class="col-4">
+                                    <label class="col-form-label">Time remaining:</label>
+                                </div>
+                                <div class="col-8">
+                                    <div class="form-control-plaintext">
+                                        <span id="timeout"></span> seconds
+                                    </div>
+                                </div>
+                            </div>
 
-        loadAudioCaptcha = function(){
-            let lang = $("#audio_language").val();
-            $.ajax({
-                url: "/captcha/audio",
-                method: "GET",
-                headers : { "X-Captcha-Challenge" : captchaDetails.challenge },
-                xhrFields: { responseType: "blob" },
-                data: { language: lang },
-                success: function (data) {
-                    $("#audio_challenge").attr("src", window.URL.createObjectURL(data));
-                }
-            });
-        };
+                            <div class="row">
+                                <div class="col-6"></div>
+                                <div class="col-6 d-grid gap-2 d-flex justify-content-end">
+                                    <input type="button" id="verify" value="verify" type="button" class="btn btn-primary"/>
+                                    <input type="button" id="refresh" value="refresh" type="button" class="btn btn-secondary"/>
+                                </div>
+                            </div>
 
-        verify = function(){
-            let answer = $("#answer").val();
-            $.ajax({
-                url: "/captcha/verify",
-                method: "POST",
-                headers : { "X-Captcha-Challenge" : captchaDetails.challenge },
-                data: { answer: answer },
-                success: function (result) {
-                    if(result.valid){
-                        alert("Solved");
-                    }else{
-                        alert("Nope");
-                    }
-                }
-            });
-        }
-
-        updateTimeout = function(){
-            if(captchaDetails.timeoutSeconds >= 0){
-                $("#timeout").text(captchaDetails.timeoutSeconds);
-                captchaDetails.timeoutSeconds -= 1;
-                captchaDetails.timer = setTimeout(updateTimeout, 1000);
-            }else{
-                console.log("Captcha timeout expired... refreshing.");
-                refreshChallenge();
-            }
-        };
-    </script>
-</head>
-<body>
-
-<div>
-    <div>
-        <image id="image_challenge" src="" ></image>
-    </div>
-
-    <div>
-        <audio controls id="audio_challenge" src="" type="audio/x-wav"> </audio>
-    </div>
-
-    <p>Time remaining: <span id="timeout"></span> seconds</p>
+                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
 
-    <form>
-        <label for="audio_language">Audio language:</label>
-        <select id="audio_language">
-            <option value="EN" selected>English</option>
-            <option value="NL">Nederlands</option>
-        </select>
-        <br/>
-        <label for="answer">Answer:</label>
-        <input type="text" id="answer" />
-        <input type="button" id="verify" value="verify" />
-        <br/>
-        <input type="button" id="refresh" value="refresh" />
-    </form>
-</div>
 
-</body>
+
+        <script src="jquery-3.6.0.js"></script>
+        <script src="bootstrap-5.1.3.bundle.js"></script>
+        <script src="captcha.js"></script>
+    </body>
 </html>
