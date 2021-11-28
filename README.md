@@ -4,8 +4,8 @@
 Tiny java library for generating images and audio-fragments for use in Captcha's. 
 
 Features:
-- Easy configuration and customization of the difficulty level.
-- Supports internationalization for audio, with several English and Dutch voices included.
+- Fluent java api for easy customization of the captcha and difficulty level.
+- Supports internationalization for audio, with multiple English and Dutch voices included (easily extensible)
 - Minimal number of third party libraries required. 
 
 ### Captcha4j-web-demo
