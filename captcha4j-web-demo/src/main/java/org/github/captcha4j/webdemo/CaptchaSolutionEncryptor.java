@@ -1,6 +1,5 @@
 package org.github.captcha4j.webdemo;
 
-import org.jasypt.util.text.AES256TextEncryptor;
 import org.jasypt.util.text.TextEncryptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,10 +22,10 @@ public class CaptchaSolutionEncryptor {
         this.textEncryptor = textEncryptor;
     }
 
-    public Solution encrypt(String answer){
+    public Challenge encrypt(String answer){
         long validUntil = System.currentTimeMillis() + (captchaTimeout * 1000);
         String encryptedData = textEncryptor.encrypt(validUntil + "." + answer);
-        return new Solution(
+        return new Challenge(
             answer,
             validUntil,
             captchaTimeout,
@@ -34,13 +33,13 @@ public class CaptchaSolutionEncryptor {
         );
     }
 
-    public Solution decrypt(String encryptedData){
+    public Challenge decrypt(String encryptedData){
         Matcher m = captchaSolutionRegex.matcher(textEncryptor.decrypt(encryptedData));
         if(!m.matches()) {
             throw new IllegalArgumentException("Unexpected content in encrypted string");
         }
 
-        return new Solution(
+        return new Challenge(
             m.group("solution"),
             Long.parseLong(m.group("validUntil")),
             captchaTimeout,
@@ -48,13 +47,13 @@ public class CaptchaSolutionEncryptor {
         );
     }
 
-    public static class Solution {
+    public static class Challenge {
         private final String answer;
         private final String encryptedData;
         private final long validUntil;
         private final int timeoutInSeconds;
 
-        public Solution(String answer, long validUntil, int timeoutInSeconds, String encryptedData) {
+        public Challenge(String answer, long validUntil, int timeoutInSeconds, String encryptedData) {
             this.answer = answer.trim();
             this.validUntil = validUntil;
             this.timeoutInSeconds = timeoutInSeconds;

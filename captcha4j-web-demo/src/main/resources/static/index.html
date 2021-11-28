@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script src="jquery-3.6.0.js"></script>
+    <title>Captcha4J Demo</title>
+
+    <script>
+        $(document).ready(function() {
+            $("#refresh").on('click',refreshChallenge);
+            $("#audio_language").on('change', loadAudioCaptcha);
+            $("#verify").on('click', verify);
+            refreshChallenge()
+        });
+
+        let captchaDetails = {};
+
+        refreshChallenge = function(){
+            $.ajax({
+                url: "/captcha/challenge",
+                method: "GET",
+                success: function (data, status, xhr) {
+                    clearTimeout(captchaDetails.timer)
+                    captchaDetails.challenge = xhr.getResponseHeader("X-Captcha-Challenge");
+                    captchaDetails.timeoutSeconds = xhr.getResponseHeader("X-Captcha-Timeout");
+                    captchaDetails.validUntil = xhr.getResponseHeader("X-Captcha-ValidUntil");
+
+                    updateTimeout();
+                    loadImageCaptcha();
+                    loadAudioCaptcha();
+                    $("#answer").val("");
+                }
+            });
+        };
+
+        loadImageCaptcha = function(){
+            $.ajax({
+                url: "/captcha/image",
+                method: "GET",
+                headers : { "X-Captcha-Challenge" : captchaDetails.challenge },
+                xhrFields: { responseType: "blob" },
+                success: function (data) {
+                    $("#image_challenge").attr("src", window.URL.createObjectURL(data));
+                }
+            });
+        };
+
+        loadAudioCaptcha = function(){
+            let lang = $("#audio_language").val();
+            $.ajax({
+                url: "/captcha/audio",
+                method: "GET",
+                headers : { "X-Captcha-Challenge" : captchaDetails.challenge },
+                xhrFields: { responseType: "blob" },
+                data: { language: lang },
+                success: function (data) {
+                    $("#audio_challenge").attr("src", window.URL.createObjectURL(data));
+                }
+            });
+        };
+
+        verify = function(){
+            let answer = $("#answer").val();
+            $.ajax({
+                url: "/captcha/verify",
+                method: "POST",
+                headers : { "X-Captcha-Challenge" : captchaDetails.challenge },
+                data: { answer: answer },
+                success: function (result) {
+                    if(result.valid){
+                        alert("Solved");
+                    }else{
+                        alert("Nope");
+                    }
+                }
+            });
+        }
+
+        updateTimeout = function(){
+            if(captchaDetails.timeoutSeconds >= 0){
+                $("#timeout").text(captchaDetails.timeoutSeconds);
+                captchaDetails.timeoutSeconds -= 1;
+                captchaDetails.timer = setTimeout(updateTimeout, 1000);
+            }else{
+                console.log("Captcha timeout expired... refreshing.");
+                refreshChallenge();
+            }
+        };
+    </script>
+</head>
+<body>
+
+<div>
+    <div>
+        <image id="image_challenge" src="" ></image>
+    </div>
+
+    <div>
+        <audio controls id="audio_challenge" src="" type="audio/x-wav"> </audio>
+    </div>
+
+    <p>Time remaining: <span id="timeout"></span> seconds</p>
+
+
+    <form>
+        <label for="audio_language">Audio language:</label>
+        <select id="audio_language">
+            <option value="EN" selected>English</option>
+            <option value="NL">Nederlands</option>
+        </select>
+        <br/>
+        <label for="answer">Answer:</label>
+        <input type="text" id="answer" />
+        <input type="button" id="verify" value="verify" />
+        <br/>
+        <input type="button" id="refresh" value="refresh" />
+    </form>
+</div>
+
+</body>
+</html>

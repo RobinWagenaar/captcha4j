@@ -6,7 +6,9 @@ import com.github.captcha4j.core.audio.producer.Language;
 import com.github.captcha4j.core.image.ImageCaptcha;
 import com.github.captcha4j.core.image.ImageCaptchaBuilder;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
+import org.github.captcha4j.webdemo.CaptchaSolutionEncryptor.Challenge;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,48 +19,80 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+
+/**
+ * Controller for generating and validating captcha's.
+ *
+ * First, a client requests a new challenge by calling the /captcha/challenge endpoint. It
+ * generates a random alphanumeric string, and calculates an expiration timestamp based on
+ * preset timeout. This endpoint encrypts it, and returns this challenge to the client.
+ *
+ * The client can choose generate an image or an audio sample based on the challenge:
+ *    /captcha/image returns a PNG-image which contains the (somewhat scrambled) text.
+ *    /captcha/audio returns a WAV-fragment containing spoken text in a supported language.
+ *
+ * When solving the captcha, the client send both their answer and the original challenge
+ * to the /catpcha/verify endpoint, which decrypts and checks the result.
+ */
 @RestController
 @RequestMapping("/captcha")
 public class CaptchaController {
 
-    private static final String CAPTCHA_SOLUTION_HEADER = "X-Captcha-Solution";
+    private static final String CAPTCHA_CHALLENGE_HEADER = "X-Captcha-Challenge";
     private static final String CAPTCHA_VALIDITY_HEADER = "X-Captcha-ValidUntil";
     private static final String CAPTCHA_TIMEOUT_HEADER = "X-Captcha-Timeout";
 
     private final CaptchaSolutionEncryptor captchaService;
+
+    @Value("${captcha.characters}")
+    private int captchaLength;
 
     @Autowired
     public CaptchaController(CaptchaSolutionEncryptor captchaService){
         this.captchaService = captchaService;
     }
 
+    @GetMapping("/challenge")
+    public void generateChallenge(HttpServletResponse response) {
+        String answer = generateAlphanumericRandomString(captchaLength);
+        Challenge challenge = captchaService.encrypt(answer);
+
+        response.addHeader(CAPTCHA_CHALLENGE_HEADER, challenge.getEncryptedData());
+        response.addHeader(CAPTCHA_VALIDITY_HEADER, String.valueOf(challenge.getValidUntil()));
+        response.addHeader(CAPTCHA_TIMEOUT_HEADER, String.valueOf(challenge.getTimeoutInSeconds()));
+    }
 
     @GetMapping("/image")
-    public void generateImage(HttpServletResponse response) throws IOException {
-        String answer = "asdfasf123";
+    public void generateImage(
+            HttpServletResponse response,
+            @RequestHeader(value = CAPTCHA_CHALLENGE_HEADER) String encryptedChallenge) throws IOException {
+        Challenge challenge = captchaService.decrypt(encryptedChallenge);
+        String answer = challenge.getAnswer();
+
         ImageCaptcha captcha = new ImageCaptchaBuilder(200, 100)
                 .addAnswer(()->answer)
                 .addNoise()
                 .build();
 
         response.setContentType(MediaType.IMAGE_PNG.toString());
-        addCaptchaHeaders(response, answer);
-
         InputStream is = new ByteArrayInputStream(captcha.getData().toByteArray());
         IOUtils.copy(is, response.getOutputStream());
     }
 
     @GetMapping("/audio")
-    public void generateAudio(HttpServletResponse response) throws IOException {
-        String answer = "123456789";
+    public void generateAudio(
+            HttpServletResponse response,
+            @RequestHeader(value = CAPTCHA_CHALLENGE_HEADER) String encryptedChallenge,
+            @RequestParam(value = "language") Language language) throws IOException {
+        Challenge challenge = captchaService.decrypt(encryptedChallenge);
+        String answer = challenge.getAnswer();
+
         AudioCaptcha captcha = new AudioCaptchaBuilder()
                 .addAnswer(answer)
-                .addVoice(Language.EN)
+                .addVoice(language)
                 .build();
 
         response.setContentType(captcha.getDataType());
-        addCaptchaHeaders(response, answer);
-
         InputStream is = new ByteArrayInputStream(captcha.getData().toByteArray());
         IOUtils.copy(is, response.getOutputStream());
     }
@@ -67,17 +101,17 @@ public class CaptchaController {
     @PostMapping("/verify")
     @ResponseBody
     public CaptchaVerificationResult verify(
-            @RequestHeader(CAPTCHA_SOLUTION_HEADER) String encryptedSolution,
+            @RequestHeader(CAPTCHA_CHALLENGE_HEADER) String encryptedChallenge,
             @RequestParam("answer") String userSuppliedAnswer) {
 
-        CaptchaSolutionEncryptor.Solution solution = captchaService.decrypt(encryptedSolution);
+        Challenge challenge = captchaService.decrypt(encryptedChallenge);
         CaptchaVerificationResult result = new CaptchaVerificationResult();
 
-        if (!solution.isCorrect(userSuppliedAnswer)){
+        if (!challenge.isCorrect(userSuppliedAnswer)){
             result.errors.add("ANSWER_INCORRECT");
         }
 
-        if (solution.isExpired()){
+        if (challenge.isExpired()){
             result.errors.add("CAPTCHA_EXPIRED");
         }
 
@@ -88,21 +122,23 @@ public class CaptchaController {
         return result;
     }
 
-    private void addCaptchaHeaders(HttpServletResponse response, String answer){
-        CaptchaSolutionEncryptor.Solution solution = captchaService.encrypt(answer);
-        response.addHeader(CAPTCHA_SOLUTION_HEADER, solution.getEncryptedData());
-        response.addHeader(CAPTCHA_VALIDITY_HEADER, String.valueOf(solution.getValidUntil()));
-        response.addHeader(CAPTCHA_TIMEOUT_HEADER, String.valueOf(solution.getTimeoutInSeconds()));
+    private String generateAlphanumericRandomString(int length){
+        String alphaNumericString = "0123456789abcdefghijklmnopqrstuvxyz";
+
+        StringBuilder sb = new StringBuilder(length);
+        for (int i = 0; i < sb.capacity(); i++) {
+            int index = (int)(alphaNumericString.length()* Math.random());
+            sb.append(alphaNumericString.charAt(index));
+        }
+        return sb.toString();
     }
 
     public static class CaptchaVerificationResult {
         boolean valid = false;
         List<String> errors = new ArrayList<>();
-
         public boolean isValid() {
             return valid;
         }
-
         public List<String> getErrors() {
             return errors;
         }

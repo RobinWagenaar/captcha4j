@@ -3,7 +3,7 @@
 Tiny java library for generating images and audio-fragments for use in Captcha's. 
 
 - Easy configuration and customization of the difficulty level.
-- Supports internationalization for audio, with 7 English voices and 4 Dutch voices already included.
+- Supports internationalization for audio, with several English and Dutch voices included.
 - Minimal number of third party libraries required. 
 
 ## Usage
