@@ -1,10 +1,19 @@
 # Captcha4J
 
+### Captcha4j-core
 Tiny java library for generating images and audio-fragments for use in Captcha's. 
 
+Features:
 - Easy configuration and customization of the difficulty level.
 - Supports internationalization for audio, with several English and Dutch voices included.
 - Minimal number of third party libraries required. 
+
+### Captcha4j-web-demo
+Spring-boot based reference implementation for using Captcha4j-core in a real-world(ish) environment.  
+
+Features:
+- Completely stateless back-end (easy to use horizontally scaled applications) for generating, refreshing and validating captcha's. 
+- Simple-to-read HTML/JS front-end that consumes these webservices.
 
 ## Usage
 
