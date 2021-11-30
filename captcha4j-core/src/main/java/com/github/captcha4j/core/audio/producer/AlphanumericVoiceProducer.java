@@ -2,6 +2,8 @@ package com.github.captcha4j.core.audio.producer;
 
 import com.github.captcha4j.core.audio.Sample;
 import com.github.captcha4j.core.util.FileUtil;
+import com.sun.org.slf4j.internal.Logger;
+import com.sun.org.slf4j.internal.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -21,10 +23,9 @@ import java.util.*;
  * @author <a href="mailto:subhajitdas298@gmail.com">Subhajit Das</a>
  */
 public class AlphanumericVoiceProducer implements VoiceProducer {
-    private Language currentLanguage;
+    private static final Logger LOGGER = LoggerFactory.getLogger(AlphanumericVoiceProducer.class);
     private static final Random RAND = new SecureRandom();
-
-    private static Map<Language, List<String>> VOICES_BY_LANGUAGE = new HashMap<Language, List<String>>(){{
+    private static final Map<Language, List<String>> VOICES_BY_LANGUAGE = new HashMap<Language, List<String>>(){{
         put(Language.EN, Arrays.asList(
                 "acclivity",
                 "desuperanton"
@@ -37,6 +38,8 @@ public class AlphanumericVoiceProducer implements VoiceProducer {
                 "liesbeth"
         ));
     }};
+
+    private Language currentLanguage;
 
     public AlphanumericVoiceProducer(Language language){
         this.currentLanguage = language;
@@ -58,7 +61,7 @@ public class AlphanumericVoiceProducer implements VoiceProducer {
         List<String> voices = VOICES_BY_LANGUAGE.get(currentLanguage);
         String randomVoice = voices.get(RAND.nextInt(voices.size()));
         String file = "/sounds/voices/"+currentLanguage.toString().toLowerCase()+"/"+randomVoice+"/"+Character.toLowerCase(chr)+"-"+randomVoice + ".wav";
-        System.out.println(file);
+        LOGGER.debug("Loading voice sample from file: {}", file);
         return FileUtil.readSample(file);
     }
 

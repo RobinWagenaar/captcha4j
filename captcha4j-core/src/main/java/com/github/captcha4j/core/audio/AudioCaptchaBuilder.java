@@ -6,6 +6,8 @@ import com.github.captcha4j.core.audio.producer.VoiceProducer;
 import com.github.captcha4j.core.audio.producer.noise.NoiseProducer;
 import com.github.captcha4j.core.audio.producer.noise.RandomNoiseProducer;
 import com.github.captcha4j.core.image.producer.NumbersAnswerProducer;
+import com.sun.org.slf4j.internal.Logger;
+import com.sun.org.slf4j.internal.LoggerFactory;
 
 import java.security.SecureRandom;
 import java.util.ArrayList;
@@ -19,7 +21,7 @@ import java.util.Random;
  * @author <a href="mailto:james.childers@gmail.com">James Childers</a>
  */
 public class AudioCaptchaBuilder {
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(AudioCaptchaBuilder.class);
     private static final Random RAND = new SecureRandom();
 
 
@@ -101,6 +103,7 @@ public class AudioCaptchaBuilder {
      * @return the audio captcha
      */
     public AudioCaptcha build() {
+
         // Make sure we have at least one voiceProducer
         if (voiceProds.size() == 0) {
             addVoice(Language.EN); //default EN
@@ -123,8 +126,7 @@ public class AudioCaptchaBuilder {
 
         // 3. Add noise, if any, and return the result
         if (noiseProds.size() > 0) {
-            NoiseProducer nProd = noiseProds.get(RAND.nextInt(noiseProds
-                    .size()));
+            NoiseProducer nProd = noiseProds.get(RAND.nextInt(noiseProds.size()));
             challenge = nProd.addNoise(samples);
 
             return new AudioCaptcha(answer, challenge);
@@ -132,6 +134,7 @@ public class AudioCaptchaBuilder {
 
         challenge = Mixer.append(samples);
 
+        LOGGER.debug("Generated new audio captcha from {} samples and {} noises", samples.size(), noiseProds.size());
         return new AudioCaptcha(answer, challenge);
     }
 

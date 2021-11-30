@@ -10,11 +10,14 @@ import com.github.captcha4j.core.image.producer.noise.CurvedLineNoiseProducer;
 import com.github.captcha4j.core.image.producer.noise.NoiseProducer;
 import com.github.captcha4j.core.image.renderer.DefaultWordRenderer;
 import com.github.captcha4j.core.image.renderer.WordRenderer;
+import com.sun.org.slf4j.internal.Logger;
+import com.sun.org.slf4j.internal.LoggerFactory;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
 public class ImageCaptchaBuilder {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ImageCaptchaBuilder.class);
 
     private String answer = "";
     private BufferedImage img;
@@ -181,6 +184,7 @@ public class ImageCaptchaBuilder {
 
         img = bg;
 
+        LOGGER.debug("Created new image captcha with width={} and height={}", img.getWidth(), img.getHeight());
         return new ImageCaptcha(answer, img);
     }
 
