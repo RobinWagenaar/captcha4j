@@ -6,8 +6,8 @@ import com.github.captcha4j.core.audio.producer.VoiceProducer;
 import com.github.captcha4j.core.audio.producer.noise.NoiseProducer;
 import com.github.captcha4j.core.audio.producer.noise.RandomNoiseProducer;
 import com.github.captcha4j.core.image.producer.NumbersAnswerProducer;
-import com.sun.org.slf4j.internal.Logger;
-import com.sun.org.slf4j.internal.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.security.SecureRandom;
 import java.util.ArrayList;
