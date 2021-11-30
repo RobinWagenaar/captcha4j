@@ -2,14 +2,9 @@ package com.github.captcha4j.core.audio.producer;
 
 import com.github.captcha4j.core.audio.Sample;
 import com.github.captcha4j.core.util.FileUtil;
-import com.sun.org.slf4j.internal.Logger;
-import com.sun.org.slf4j.internal.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.security.SecureRandom;
 import java.util.*;
 
