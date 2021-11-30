@@ -20,7 +20,7 @@ import java.util.*;
  * @author <a href="mailto:james.childers@gmail.com">James Childers</a>
  * @author <a href="mailto:subhajitdas298@gmail.com">Subhajit Das</a>
  */
-public class NumberVoiceProducer implements VoiceProducer {
+public class AlphanumericVoiceProducer implements VoiceProducer {
     private Language currentLanguage;
     private static final Random RAND = new SecureRandom();
 
@@ -38,7 +38,7 @@ public class NumberVoiceProducer implements VoiceProducer {
         ));
     }};
 
-    public NumberVoiceProducer(Language language){
+    public AlphanumericVoiceProducer(Language language){
         this.currentLanguage = language;
     }
 

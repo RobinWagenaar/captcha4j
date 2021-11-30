@@ -1,12 +1,11 @@
 package com.github.captcha4j.core.audio;
 
 import com.github.captcha4j.core.audio.producer.Language;
-import com.github.captcha4j.core.audio.producer.NumberVoiceProducer;
+import com.github.captcha4j.core.audio.producer.AlphanumericVoiceProducer;
 import com.github.captcha4j.core.audio.producer.VoiceProducer;
 import com.github.captcha4j.core.audio.producer.noise.NoiseProducer;
 import com.github.captcha4j.core.audio.producer.noise.RandomNoiseProducer;
 import com.github.captcha4j.core.image.producer.NumbersAnswerProducer;
-import com.github.captcha4j.core.image.producer.TextProducer;
 
 import java.security.SecureRandom;
 import java.util.ArrayList;
@@ -58,7 +57,7 @@ public class AudioCaptchaBuilder {
      * @return the builder with voice added
      */
     public AudioCaptchaBuilder addVoice(Language lang) {
-        voiceProds.add(new NumberVoiceProducer(lang));
+        voiceProds.add(new AlphanumericVoiceProducer(lang));
 
         return this;
     }

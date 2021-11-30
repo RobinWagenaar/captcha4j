@@ -1,76 +1,59 @@
 package com.github.captcha4j.core.image.renderer;
 
+import com.github.captcha4j.core.util.FileUtil;
+
 import java.awt.*;
 import java.awt.font.FontRenderContext;
 import java.awt.font.GlyphVector;
+import java.awt.font.TextLayout;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 /**
- * Renders the answer onto the image.
+ * Renders a text onto the image.
  *
+ * @author <a href="mailto:robin.wagenaar@gmail.com">Robin Wagenaar</a>
  * @author <a href="mailto:james.childers@gmail.com">James Childers</a>
  * @author <a href="mailto:subhajitdas298@gmail.com">Subhajit Das</a>
  */
 public class DefaultWordRenderer implements WordRenderer {
 
-    /**
-     * The secure random
-     */
-    private static final Random RAND = new SecureRandom();
-    /**
-     * List of default colors
-     */
-    private static final List<Color> DEFAULT_COLORS = new ArrayList<>();
-    /**
-     * List of default fonts
-     */
-    private static final List<Font> DEFAULT_FONTS = new ArrayList<>();
-    // The text will be rendered 25%/5% of the image height/width from the X and Y axes
-    /**
-     * The Y offset
-     */
-    private static final double YOFFSET = 0.25;
-    /**
-     * The x offset
-     */
-    private static final double XOFFSET = 0.05;
-
-    static {
-        DEFAULT_COLORS.add(Color.BLACK);
-        DEFAULT_FONTS.add(new Font("Arial", Font.BOLD, 40));
-        DEFAULT_FONTS.add(new Font("Courier", Font.BOLD, 40));
-    }
+    private Color color = Color.BLACK;
+    private Font font;
 
     /**
-     * List of colors
-     */
-    private final List<Color> _colors = new ArrayList<>();
-    /**
-     * The list of fonts
-     */
-    private final List<Font> _fonts = new ArrayList<>();
-
-    /**
-     * Use the default color (black) and fonts (Arial and Courier).
-     */
-    public DefaultWordRenderer() {
-        this(DEFAULT_COLORS, DEFAULT_FONTS);
-    }
-
-    /**
-     * Build a <code>WordRenderer</code> using the given <code>Color</code>s and
-     * <code>Font</code>s.
+     * The defaults are:
+     * - Color: black
+     * - Font: Verily
      *
-     * @param colors List of colors
-     * @param fonts  List of fonts
+     * Will attempt to find a suitable font size, depending on the dimensions of
+     * the image and the font selected. Retains a padding of about 5% of the image
+     * width.
      */
-    public DefaultWordRenderer(List<Color> colors, List<Font> fonts) {
-        _colors.addAll(colors);
-        _fonts.addAll(fonts);
+    public DefaultWordRenderer(){
+        try {
+            font = Font.createFont(EmbeddedFont.WHITE_RABBIT.getType(), FileUtil.readResource(EmbeddedFont.WHITE_RABBIT.getFilename()));
+        } catch (IOException | FontFormatException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
+    /**
+     * Construct a <code>WordRenderer</code> using the given <code>Color</code> and
+     * <code>Font</code>.
+     *
+     * @param color
+     * @param font
+     */
+    public DefaultWordRenderer(Color color, Font font) {
+        this.color = color;
+        this.font = font;
     }
 
     /**
@@ -83,32 +66,39 @@ public class DefaultWordRenderer implements WordRenderer {
     public void render(final String word, BufferedImage image) {
         Graphics2D g = image.createGraphics();
 
-        RenderingHints hints = new RenderingHints(
-                RenderingHints.KEY_ANTIALIASING,
-                RenderingHints.VALUE_ANTIALIAS_ON);
-        hints.add(new RenderingHints(RenderingHints.KEY_RENDERING,
-                RenderingHints.VALUE_RENDER_QUALITY));
+        RenderingHints hints = new RenderingHints( RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        hints.add(new RenderingHints(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY));
         g.setRenderingHints(hints);
 
-        FontRenderContext frc = g.getFontRenderContext();
-        int xBaseline = (int) Math.round(image.getWidth() * XOFFSET);
-        int yBaseline = image.getHeight() - (int) Math.round(image.getHeight() * YOFFSET);
+        int padding = image.getWidth()/100*5; //5% of width
+        float maxFontSize = calcMaxFontSize(word, font, image, padding, g);
 
-        char[] chars = new char[1];
-        for (char c : word.toCharArray()) {
-            chars[0] = c;
+        g.setColor(this.color);
+        g.setFont(this.font.deriveFont(maxFontSize));
+        FontMetrics fm = g.getFontMetrics();
 
-            g.setColor(_colors.get(RAND.nextInt(_colors.size())));
+        int xOffset = ((image.getWidth() - fm.stringWidth(word)) / 2);
+        int yOffset = ((image.getHeight() - fm.getHeight()) / 2) + fm.getAscent();
+        g.drawString(word, xOffset, yOffset);
+    }
 
-            int choiceFont = RAND.nextInt(_fonts.size());
-            Font font = _fonts.get(choiceFont);
-            g.setFont(font);
+    private float calcMaxFontSize(String text, Font f, BufferedImage img, int padding, Graphics2D g){
+        int maxTextWidth = img.getWidth() - (2*padding);
+        int maxTextHeight = img.getHeight() - (2*padding);
 
-            GlyphVector gv = font.createGlyphVector(frc, chars);
-            g.drawChars(chars, 0, chars.length, xBaseline, yBaseline);
+        float currentFontSize = 8f;
+        int currentTextWidth = 0;
+        int currentTextHeight = 0;
 
-            int width = (int) gv.getVisualBounds().getWidth();
-            xBaseline = xBaseline + width;
+        while (currentTextWidth < maxTextWidth && currentTextHeight < maxTextHeight) {
+            currentFontSize += 2f;
+            Font resizedFont = f.deriveFont(currentFontSize);
+            FontRenderContext frc = g.getFontRenderContext();
+            Rectangle2D bb = new TextLayout(text, resizedFont, frc).getBounds();
+            currentTextWidth = (int) bb.getWidth();
+            currentTextHeight = (int) bb.getHeight();
         }
+
+        return currentFontSize - 2f;
     }
 }
